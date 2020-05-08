@@ -12,6 +12,7 @@ public class Algorithm {
     private static final String NO_CARS = "Автомобилей введенной марки не найдено";
     private static final String AVERAGE_COST_IS = "Средняя стоимость машин марки ";
     Matcher matcher;
+    //TODO Поменять структуру данных для хранения данных о машине, так как повторяющийся элемент - допустим
     HashSet<String> data;
     FileWorker fileWorker;
 

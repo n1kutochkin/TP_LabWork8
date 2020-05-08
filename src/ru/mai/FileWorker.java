@@ -27,6 +27,7 @@ public class FileWorker {
         return out;
     }
 
+    //TODO Сделать верные кодировки
     public static BufferedReader makeReader() {
         try {
             return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), StandardCharsets.UTF_8));
