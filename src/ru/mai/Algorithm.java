@@ -27,7 +27,8 @@ public class Algorithm {
 
         while (in.hasNextLine() && !in.hasNext("~")) {
             Car car = new Car(in.nextLine());
-
+            //TODO убрать методы по прямому выводу данных в файл-воркер
+            //TODO сделать реализацию формирования списка для вывода в поток (в виде готового файла, структры данных)
             try {
                 if (carBase.getCars().contains(car)) {
                     for (Car iter : carBase.getCars()) {
@@ -58,6 +59,9 @@ public class Algorithm {
 
         for (String str : data) {
             matcher = pattern.matcher(str);
+            //TODO Добавить выброс и обработку исключений при некорректных данных
+            //TODO Добавить логирование некорректного ввода
+
             while (matcher.find()) {
 //                Car buffCar = new Car(matcher.group(Car.BRAND), Long.parseLong(matcher.group(Car.COST)));
                 Car buffCar = new Car(matcher.group(Car.BRAND));
