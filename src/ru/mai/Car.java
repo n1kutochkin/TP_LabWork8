@@ -3,6 +3,8 @@ package ru.mai;
 import java.util.ArrayList;
 import java.util.Objects;
 
+
+//TODO убрать интерфейс сравнения, так как все равно нет необходимости сравнивать между собой объекты
 class Car implements Comparable<Car> {
     public static final byte BRAND = 1;
     public static final byte COST = 2;
@@ -17,6 +19,7 @@ class Car implements Comparable<Car> {
         this.averageCost = Long.valueOf(0);
     }
 
+    //TODO убрать этот конструктор, чтобы не пользоваться им для поиска сущностей по сет - реализовать ключ-значение
     Car(String brand) {
         this.brand = brand;
 //        this.cost = null;
