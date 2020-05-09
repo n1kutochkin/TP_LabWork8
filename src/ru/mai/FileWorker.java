@@ -4,7 +4,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
+import java.rmi.UnexpectedException;
+import java.util.ArrayList;
 
 public class FileWorker {
 
@@ -30,16 +31,19 @@ public class FileWorker {
     //TODO Сделать верные кодировки
     public static BufferedReader makeReader() {
         try {
-            return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), StandardCharsets.UTF_8));
+            return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), "Cp1251"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             try {
                 Files.createFile(Paths.get(INPUT_FILE));
-                return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), StandardCharsets.UTF_8));
+                return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), "Cp1251"));
             } catch (IOException ex) {
                 ex.printStackTrace();
                 return null;
             }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -50,7 +54,7 @@ public class FileWorker {
             e.printStackTrace();
             try {
                 Files.createFile(Paths.get(OUTPUT_FILE));
-                return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUT_FILE),StandardCharsets.UTF_8));
+                return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUT_FILE), StandardCharsets.UTF_8));
             } catch (IOException ex) {
                 ex.printStackTrace();
                 return null;
@@ -58,8 +62,8 @@ public class FileWorker {
         }
     }
 
-    public HashSet<String> getAllStringsInFile() {
-        HashSet<String> buffSet = new HashSet<>();
+    public ArrayList<String> getAllStringsInFile() {
+        ArrayList<String> buffSet = new ArrayList<>();
         String line;
 
         try {
@@ -72,6 +76,18 @@ public class FileWorker {
         }
 
         return buffSet;
+    }
+
+    public void printData(ArrayList<String> data) {
+        for (String out : data) {
+            try {
+                this.out.write(out);
+                this.out.write("\n");
+                this.out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //TODO Сделать метод вывода всего стека информации из алгоритма в потока/файла/списка строк

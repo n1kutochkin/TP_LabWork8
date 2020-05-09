@@ -11,7 +11,8 @@ public class Main {
     public static void main(String[] args) {
         FileWorker fileWorker = new FileWorker();
         //TODO Убрать передачу файл-воркера в алгоритм
-        Algorithm algorithm = new Algorithm(fileWorker.getAllStringsInFile(), fileWorker);
+        Algorithm algorithm = new Algorithm(fileWorker.getAllStringsInFile());
         algorithm.start();
+        fileWorker.printData(algorithm.getOutputData());
     }
 }

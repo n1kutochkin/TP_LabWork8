@@ -6,11 +6,12 @@ import java.util.Objects;
 
 //TODO убрать интерфейс сравнения, так как все равно нет необходимости сравнивать между собой объекты
 class Car implements Comparable<Car> {
+
     public static final byte BRAND = 1;
     public static final byte COST = 2;
-    Long averageCost;
-    String brand;
-    ArrayList<Long> costs;
+    private Long averageCost;
+    private String brand;
+    private ArrayList<Long> costs;
 
     Car(String brand, Long cost) {
         this.brand = brand;
@@ -20,20 +21,24 @@ class Car implements Comparable<Car> {
     }
 
     //TODO убрать этот конструктор, чтобы не пользоваться им для поиска сущностей по сет - реализовать ключ-значение
-    Car(String brand) {
-        this.brand = brand;
-//        this.cost = null;
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public Long getAverageCost() {
+        return averageCost;
     }
 
     public void addPrice(long cost) {
         costs.add(cost);
     }
 
-    public long calculateAverageCost() {
-        for (Long cost : costs ) {
+    public void calculateAverageCost() {
+        for (Long cost : costs) {
             averageCost += cost;
         }
-        return averageCost = (long) Math.floor(averageCost / costs.size());
+        averageCost = (long) Math.floor(averageCost / costs.size());
     }
 
     @Override

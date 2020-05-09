@@ -1,52 +1,48 @@
 package ru.mai;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Scanner;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Algorithm {
+
     static Pattern pattern = Pattern.compile("\\\"([А-Яа-яa-zA-z]+)\\\":\\\"(\\d+)\\\"");
     static Scanner in = new Scanner(System.in);
     private static final String NO_CARS = "Автомобилей введенной марки не найдено";
     private static final String AVERAGE_COST_IS = "Средняя стоимость машин марки ";
-    Matcher matcher;
-    //TODO Поменять структуру данных для хранения данных о машине, так как повторяющийся элемент - допустим
-    HashSet<String> data;
-    FileWorker fileWorker;
+    private Matcher matcher;
+    private ArrayList<String> data;
+    private ArrayList<String> outputData;
+    private Logger logger;
 
-    Algorithm(HashSet<String> data, FileWorker fileWorker) {
+
+    Algorithm(ArrayList<String> data) {
         this.data = data;
-        this.fileWorker = fileWorker;
+        this.logger = MyLogger.getMyLogger(Algorithm.class.getName());
     }
 
     public void start() {
-        CarBase carBase = generateCarBase();
-
+        HashMap<String, Car> carBase = generateCarBase();
+        outputData = new ArrayList<>();
 
         while (in.hasNextLine() && !in.hasNext("~")) {
-            Car car = new Car(in.nextLine());
-            //TODO убрать методы по прямому выводу данных в файл-воркер
-            //TODO сделать реализацию формирования списка для вывода в поток (в виде готового файла, структры данных)
-            //TODO использовать ключ-значение для нахождения сущностей машин (без дополнительной сщуности машины)
-            try {
-                if (carBase.getCars().contains(car)) {
-                    for (Car iter : carBase.getCars()) {
-                        if (iter.equals(car)) {
-                            fileWorker.getOut().write(generatePhrase(iter.brand, iter.calculateAverageCost()));
-                            break;
-                        }
-                    }
-                } else {
-                    fileWorker.getOut().write(NO_CARS);
-                }
-                fileWorker.getOut().write("\n");
-                fileWorker.getOut().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
+            String buffKey = in.nextLine();
+
+            if (carBase.containsKey(buffKey)) {
+                Car buffCar = carBase.get(buffKey);
+                buffCar.calculateAverageCost();
+                outputData.add(generatePhrase(buffCar.getBrand(), buffCar.getAverageCost()));
+            } else {
+                outputData.add(NO_CARS);
             }
         }
+    }
+
+
+    public ArrayList<String> getOutputData() {
+        return outputData;
     }
 
     private String generatePhrase(String brand, Long averageCost) {
@@ -55,28 +51,28 @@ public class Algorithm {
         return AVERAGE_COST_IS + buffStr + " " + averageCost;
     }
 
-    private CarBase generateCarBase() {
-        CarBase carBase = new CarBase();
+    private HashMap<String, Car> generateCarBase() {
+        HashMap<String, Car> carBase = new HashMap<>();
+        Integer numberOfLine = 1;
 
         for (String str : data) {
             matcher = pattern.matcher(str);
-            //TODO Добавить выброс и обработку исключений при некорректных данных
-            //TODO Добавить логирование некорректного ввода
+            try {
+                if (matcher.find()) {
+                    String buffKey = matcher.group(Car.BRAND);
 
-            while (matcher.find()) {
-//                Car buffCar = new Car(matcher.group(Car.BRAND), Long.parseLong(matcher.group(Car.COST)));
-                Car buffCar = new Car(matcher.group(Car.BRAND));
-
-                if (carBase.getCars().contains(buffCar)) {
-                    for (Car iter : carBase.getCars()) {
-                        if (iter.equals(buffCar)) {
-                            iter.addPrice(Long.parseLong(matcher.group(Car.COST)));
-                        }
+                    if (carBase.containsKey(buffKey)) {
+                        carBase.get(buffKey).addPrice(Long.parseLong(matcher.group(Car.COST)));
+                    } else {
+                        carBase.put(buffKey, new Car(buffKey, Long.parseLong(matcher.group(Car.COST))));
                     }
                 } else {
-                    carBase.getCars().add(new Car(matcher.group(Car.BRAND), Long.parseLong(matcher.group(Car.COST))));
+                    throw new InputMismatchException();
                 }
-                carBase.getCars().add(buffCar);
+            } catch (InputMismatchException e) {
+                logger.log(Level.WARNING, "Некорректные данные. Строка файла: " + numberOfLine);
+            } finally {
+                ++numberOfLine;
             }
         }
 
