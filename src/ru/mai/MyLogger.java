@@ -6,13 +6,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * Класс создания логирования
+ *
+ * @author n1kutochkin
+ */
 public class MyLogger {
 
     private static final String SYSTEM = "system";
     private static final String LOG_EXT = ".log";
     public static final Logger sysLogger = Logger.getLogger(SYSTEM);
 
-
+    /**
+     * Создает логгер для какого-то процесса с созданием файла логирования для этого процесса.
+     * @param name название процесса
+     * @return логгер этого процесса
+     */
     public static Logger getMyLogger(String name) {
         Logger logger = Logger.getLogger(name);
 

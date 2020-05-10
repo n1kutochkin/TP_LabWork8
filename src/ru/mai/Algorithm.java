@@ -6,6 +6,12 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/**
+ * Класс Алгоритм - содержит логику и вычисления.
+ *
+ * @author n1kutochkin
+ */
 public class Algorithm {
 
     private static Pattern pattern = Pattern.compile("\\\"([А-Яа-яa-zA-z]+)\\\":\\\"(\\d+)\\\"");
@@ -17,12 +23,19 @@ public class Algorithm {
     private ArrayList<String> outputData;
     private Logger logger;
 
-
+    /**
+     * Конструртора класса, создающий сущность класса. При его создании будет сразу вызван процесс считывания запросов.
+     * @param data список с данными строкового типа в формате <b>"название бренда авто":"стоимость"</b>*
+     */
     public Algorithm(List<? extends String> data) {
         this.data = (ArrayList<String>) data;
         this.logger = MyLogger.getMyLogger(Algorithm.class.getName());
+        this.start();
     }
 
+    /**
+     * Запуск считывания запросов в клавиатуры
+     */
     public void start() {
         HashMap<String, Car> carBase = generateCarBase();
         outputData = new ArrayList<>();
@@ -32,7 +45,6 @@ public class Algorithm {
 
             if (carBase.containsKey(buffKey)) {
                 Car buffCar = carBase.get(buffKey);
-                buffCar.calculateAverageCost();
                 outputData.add(generatePhrase(buffCar.getBrand(), buffCar.getAverageCost()));
             } else {
                 outputData.add(NO_CARS);
@@ -40,17 +52,31 @@ public class Algorithm {
         }
     }
 
-
+    /**
+     *
+     * @return список с информацией после запросов
+     */
     public List<? extends String> getOutputData() {
         return outputData;
     }
 
+    /**
+     * создает фразу информации о средней стоимости авто определенного бренда
+     * @param brand название бренда
+     * @param averageCost средняя стоимость
+     * @return фразу информации о средней стоимисти автомобилей бренда
+     */
     private String generatePhrase(String brand, Long averageCost) {
         StringBuilder buffStr = new StringBuilder(brand);
         buffStr.insert(0, '<').insert(buffStr.length(), '>');
         return AVERAGE_COST_IS + buffStr + " " + averageCost;
     }
 
+    /**
+     * Метод создания словаря с ключями из брендов и значениями-объектами класса Car
+     * @return словарь бренд-машины бренда
+     * @throws WrongInputException в случае строки, несоответсвующей формату <p> <b>"название бренда":"стоимость"</b>
+     */
     private HashMap<String, Car> generateCarBase() {
         HashMap<String, Car> carBase = new HashMap<>();
         Integer numberOfLine = 1;
@@ -69,7 +95,7 @@ public class Algorithm {
                 } else {
                     throw new WrongInputException(str, numberOfLine);
                 }
-            } catch (InputMismatchException e) {
+            } catch (WrongInputException e) {
                 logger.log(Level.WARNING, e.getMessage());
             } finally {
                 ++numberOfLine;
@@ -79,12 +105,20 @@ public class Algorithm {
         return carBase;
     }
 
+    /**
+     * Класс-исключение неверного ввода
+     */
     private class WrongInputException extends InputMismatchException {
 
         public WrongInputException() {
             super();
         }
 
+        /**
+         * Создает сущность класса
+         * @param line содержимое строки
+         * @param numberOfLine номер самой строки в файле
+         */
         public WrongInputException(final String line, final Integer numberOfLine) {
             super("Некорректные данные: " + line + "\t Строка файла: " + numberOfLine);
         }

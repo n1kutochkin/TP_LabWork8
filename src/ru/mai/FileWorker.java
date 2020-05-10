@@ -7,6 +7,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс работы с файлами ввода и вывода
+ */
 public class FileWorker {
 
     public BufferedReader in;
@@ -15,9 +18,23 @@ public class FileWorker {
     private static final String INPUT_FILE = "input.txt";
     private static final String OUTPUT_FILE = "output.txt";
 
+    /**
+     * Стандратный конструктор для класса. Работает с файлами с названием <b>input.txt</b> и <b>output.txt</b>
+     */
     FileWorker() {
         in = makeReader();
         out = makeWriter();
+    }
+
+    /**
+     * Конструктор класса для работы с произвольными файлами ввода и вывода данных
+     *
+     * @param inputFileName  название входящего текстового файла
+     * @param outputFileName название исходящего текстового файла
+     */
+    FileWorker(String inputFileName, String outputFileName) {
+        in = makeReader(inputFileName);
+        out = makeWriter(outputFileName);
     }
 
     public BufferedReader getIn() {
@@ -28,14 +45,26 @@ public class FileWorker {
         return out;
     }
 
-    public static BufferedReader makeReader() {
+
+    private static BufferedReader makeReader() {
+        return makeReader(INPUT_FILE);
+    }
+
+    /**
+     * создание класса читателя из файла
+     *
+     * @param inputFileName название файла
+     *
+     * @return класс чтения
+     */
+    private static BufferedReader makeReader(String inputFileName) {
         try {
-            return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), "Cp1251"));
+            return new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             try {
-                Files.createFile(Paths.get(INPUT_FILE));
-                return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), "Cp1251"));
+                Files.createFile(Paths.get(inputFileName));
+                return new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251"));
             } catch (IOException ex) {
                 ex.printStackTrace();
                 return null;
@@ -46,14 +75,25 @@ public class FileWorker {
         }
     }
 
-    public static Writer makeWriter() {
+    private Writer makeWriter() {
+        return makeWriter(OUTPUT_FILE);
+    }
+
+    /**
+     * Создание класса записи
+     *
+     * @param outputFileName название файла вывода
+     *
+     * @return буфферизированный класс вывода
+     */
+    public Writer makeWriter(String outputFileName) {
         try {
-            return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUT_FILE),StandardCharsets.UTF_8));
+            return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             try {
-                Files.createFile(Paths.get(OUTPUT_FILE));
-                return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUT_FILE), StandardCharsets.UTF_8));
+                Files.createFile(Paths.get(outputFileName));
+                return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8));
             } catch (IOException ex) {
                 ex.printStackTrace();
                 return null;
@@ -61,6 +101,11 @@ public class FileWorker {
         }
     }
 
+    /**
+     * Взятие всех строк файла в массив-список в виде строк
+     *
+     * @return массив-список со строками из файла
+     */
     public ArrayList<String> getAllStringsInFile() {
         ArrayList<String> buffSet = new ArrayList<>();
         String line;
@@ -77,6 +122,11 @@ public class FileWorker {
         return buffSet;
     }
 
+    /**
+     * Вывод всех данных из списка состоящих из элементов, подобных строкам
+     *
+     * @param data - список элементов-данных, подобных строкам, на вывод
+     */
     public void printData(List<? extends String> data) {
         for (String out : data) {
             try {
@@ -88,5 +138,4 @@ public class FileWorker {
             }
         }
     }
-
 }
