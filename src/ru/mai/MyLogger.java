@@ -10,7 +10,7 @@ public class MyLogger {
 
     private static final String SYSTEM = "system";
     private static final String LOG_EXT = ".log";
-    static private Logger sysLogger = Logger.getLogger(SYSTEM);
+    public static final Logger sysLogger = Logger.getLogger(SYSTEM);
 
 
     public static Logger getMyLogger(String name) {

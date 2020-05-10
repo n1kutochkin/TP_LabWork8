@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-//TODO убрать интерфейс сравнения, так как все равно нет необходимости сравнивать между собой объекты
 class Car implements Comparable<Car> {
 
     public static final byte BRAND = 1;
@@ -13,14 +12,12 @@ class Car implements Comparable<Car> {
     private String brand;
     private ArrayList<Long> costs;
 
-    Car(String brand, Long cost) {
+    public Car(String brand, Long cost) {
         this.brand = brand;
         this.costs = new ArrayList<>();
         this.costs.add(cost);
         this.averageCost = Long.valueOf(0);
     }
-
-    //TODO убрать этот конструктор, чтобы не пользоваться им для поиска сущностей по сет - реализовать ключ-значение
 
     public String getBrand() {
         return brand;
@@ -43,7 +40,7 @@ class Car implements Comparable<Car> {
 
     @Override
     public int compareTo(Car o) {
-        return 0;
+        return this.brand.compareTo(o.brand);
     }
 
     @Override

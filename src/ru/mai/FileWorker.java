@@ -4,8 +4,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileWorker {
 
@@ -28,7 +28,6 @@ public class FileWorker {
         return out;
     }
 
-    //TODO Сделать верные кодировки
     public static BufferedReader makeReader() {
         try {
             return new BufferedReader(new InputStreamReader(new FileInputStream(INPUT_FILE), "Cp1251"));
@@ -78,7 +77,7 @@ public class FileWorker {
         return buffSet;
     }
 
-    public void printData(ArrayList<String> data) {
+    public void printData(List<? extends String> data) {
         for (String out : data) {
             try {
                 this.out.write(out);
@@ -90,5 +89,4 @@ public class FileWorker {
         }
     }
 
-    //TODO Сделать метод вывода всего стека информации из алгоритма в потока/файла/списка строк
 }

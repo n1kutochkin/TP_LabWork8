@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 
 public class Algorithm {
 
-    static Pattern pattern = Pattern.compile("\\\"([А-Яа-яa-zA-z]+)\\\":\\\"(\\d+)\\\"");
-    static Scanner in = new Scanner(System.in);
+    private static Pattern pattern = Pattern.compile("\\\"([А-Яа-яa-zA-z]+)\\\":\\\"(\\d+)\\\"");
+    private Scanner in = new Scanner(System.in);
     private static final String NO_CARS = "Автомобилей введенной марки не найдено";
     private static final String AVERAGE_COST_IS = "Средняя стоимость машин марки ";
     private Matcher matcher;
@@ -18,8 +18,8 @@ public class Algorithm {
     private Logger logger;
 
 
-    Algorithm(ArrayList<String> data) {
-        this.data = data;
+    public Algorithm(List<? extends String> data) {
+        this.data = (ArrayList<String>) data;
         this.logger = MyLogger.getMyLogger(Algorithm.class.getName());
     }
 
@@ -41,7 +41,7 @@ public class Algorithm {
     }
 
 
-    public ArrayList<String> getOutputData() {
+    public List<? extends String> getOutputData() {
         return outputData;
     }
 
@@ -67,15 +67,26 @@ public class Algorithm {
                         carBase.put(buffKey, new Car(buffKey, Long.parseLong(matcher.group(Car.COST))));
                     }
                 } else {
-                    throw new InputMismatchException();
+                    throw new WrongInputException(str, numberOfLine);
                 }
             } catch (InputMismatchException e) {
-                logger.log(Level.WARNING, "Некорректные данные. Строка файла: " + numberOfLine);
+                logger.log(Level.WARNING, e.getMessage());
             } finally {
                 ++numberOfLine;
             }
         }
 
         return carBase;
+    }
+
+    private class WrongInputException extends InputMismatchException {
+
+        public WrongInputException() {
+            super();
+        }
+
+        public WrongInputException(final String line, final Integer numberOfLine) {
+            super("Некорректные данные: " + line + "\t Строка файла: " + numberOfLine);
+        }
     }
 }
