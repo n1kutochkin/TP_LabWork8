@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+//TODO отрабоать исключения класса Optional
 /**
  * Класс Алгоритм - содержит логику и вычисления.
  *
@@ -19,18 +19,30 @@ public class Algorithm {
     private static final String NO_CARS = "Автомобилей введенной марки не найдено";
     private static final String AVERAGE_COST_IS = "Средняя стоимость машин марки ";
     private Matcher matcher;
-    private ArrayList<String> data;
+    private Optional<ArrayList<String>> data;
     private ArrayList<String> outputData;
     private MyLogger logger;
 
     /**
      * Конструртора класса, создающий сущность класса. При его создании будет сразу вызван процесс считывания запросов.
+     *
      * @param data список с данными строкового типа в формате <b>"название бренда авто":"стоимость"</b>*
      */
-    public Algorithm(List<? extends String> data) {
-        this.data = (ArrayList<String>) data;
+    public Algorithm(List<? extends String> data) throws AlgorithmNothingToProcess {
+        this.data = Optional.ofNullable(((ArrayList<String>) data));
         this.logger = new MyLogger(Algorithm.class.getName());
         this.start();
+
+        if (!this.data.isPresent()) {
+            throw new AlgorithmNothingToProcess();
+        }
+    }
+
+    private class AlgorithmNothingToProcess extends NullPointerException {
+
+        AlgorithmNothingToProcess() {
+            super("Нет данных для обработки. Передан null-указатель");
+        }
     }
 
     /**
@@ -81,7 +93,7 @@ public class Algorithm {
         HashMap<String, Car> carBase = new HashMap<>();
         Integer numberOfLine = 1;
 
-        for (String str : data) {
+        for (String str : data.get()) {
             matcher = pattern.matcher(str);
             try {
                 if (matcher.find()) {

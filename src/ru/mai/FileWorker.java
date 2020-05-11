@@ -158,7 +158,11 @@ public class FileWorker {
             return null;
         }
 
-        return buffSet;
+        if (buffSet.isEmpty()) {
+            return null;
+        } else {
+            return buffSet;
+        }
     }
 
     /**
