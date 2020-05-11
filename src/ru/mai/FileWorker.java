@@ -6,14 +6,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
 
 /**
  * Класс работы с файлами ввода и вывода
  */
 public class FileWorker {
 
-    public BufferedReader in;
-    public Writer out;
+    public Optional<BufferedReader> in;
+    public Optional<Writer> out;
+    private static MyLogger logger = new MyLogger(FileWorker.class.getName());
 
     private static final String INPUT_FILE = "input.txt";
     private static final String OUTPUT_FILE = "output.txt";
@@ -21,9 +24,13 @@ public class FileWorker {
     /**
      * Стандратный конструктор для класса. Работает с файлами с названием <b>input.txt</b> и <b>output.txt</b>
      */
-    FileWorker() {
-        in = makeReader();
-        out = makeWriter();
+    FileWorker() throws FileWorkerException {
+        in = Optional.ofNullable(makeReader());
+        out = Optional.ofNullable(makeWriter());
+
+        if (!in.isPresent() || !out.isPresent()) {
+            throw new FileWorkerException();
+        }
     }
 
     /**
@@ -32,22 +39,54 @@ public class FileWorker {
      * @param inputFileName  название входящего текстового файла
      * @param outputFileName название исходящего текстового файла
      */
-    FileWorker(String inputFileName, String outputFileName) {
-        in = makeReader(inputFileName);
-        out = makeWriter(outputFileName);
+    FileWorker(String inputFileName, String outputFileName) throws FileWorkerException {
+        in = Optional.ofNullable(makeReader(inputFileName));
+        out = Optional.ofNullable(makeWriter(outputFileName));
+
+        if (!in.isPresent() || !out.isPresent()) {
+            throw new FileWorkerException();
+        }
     }
 
-    public BufferedReader getIn() {
+    public Optional<BufferedReader> getIn() {
         return in;
     }
 
-    public Writer getOut() {
+    public Optional<Writer> getOut() {
         return out;
     }
 
 
     private static BufferedReader makeReader() {
         return makeReader(INPUT_FILE);
+    }
+
+    private class FileWorkerIOException extends IOException {
+
+        FileWorkerIOException(String whatHappened) {
+            super("Произошла ошибка при чтении/записи файла ввода/вывода");
+        }
+    }
+
+    private class FileWorkerException extends Exception {
+
+        FileWorkerException() {
+            super("Ошибка при работе с файлами. Смотрите лог-файл класса FileWorker.");
+        }
+    }
+
+    private class FileWorkerUnsupportedEncodingException extends UnsupportedEncodingException {
+
+        FileWorkerUnsupportedEncodingException() {
+            super("Файл, который пытаются прочесть или использовать для записи в неверной кодировке");
+        }
+    }
+
+    private class FileWorkerFileNotFoundException extends FileNotFoundException {
+
+        FileWorkerFileNotFoundException() {
+            super("Файл, который указан к чтению/записи не найден. Создаем этот файл.");
+        }
     }
 
     /**
@@ -61,16 +100,16 @@ public class FileWorker {
         try {
             return new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251"));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, e.getMessage());
             try {
                 Files.createFile(Paths.get(inputFileName));
                 return new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251"));
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, e.getMessage());
                 return null;
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
             return null;
         }
     }
@@ -90,12 +129,12 @@ public class FileWorker {
         try {
             return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, e.getMessage());
             try {
                 Files.createFile(Paths.get(outputFileName));
                 return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8));
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, e.getMessage());
                 return null;
             }
         }
@@ -111,11 +150,11 @@ public class FileWorker {
         String line;
 
         try {
-            while ((line = in.readLine()) != null) {
+            while ((line = in.get().readLine()) != null) {
                 buffSet.add(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
             return null;
         }
 
@@ -130,11 +169,11 @@ public class FileWorker {
     public void printData(List<? extends String> data) {
         for (String out : data) {
             try {
-                this.out.write(out);
-                this.out.write("\n");
-                this.out.flush();
+                this.out.get().write(out);
+                this.out.get().write("\n");
+                this.out.get().flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, e.getMessage());
             }
         }
     }

@@ -29,8 +29,12 @@ import java.nio.charset.StandardCharsets;
 public class Main {
 
     public static void main(String[] args) {
-        FileWorker fileWorker = new FileWorker();
-        Algorithm algorithm = new Algorithm(fileWorker.getAllStringsInFile());
-        fileWorker.printData(algorithm.getOutputData());
+        try {
+            FileWorker fileWorker = new FileWorker();
+            Algorithm algorithm = new Algorithm(fileWorker.getAllStringsInFile());
+            fileWorker.printData(algorithm.getOutputData());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

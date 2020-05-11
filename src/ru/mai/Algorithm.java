@@ -21,7 +21,7 @@ public class Algorithm {
     private Matcher matcher;
     private ArrayList<String> data;
     private ArrayList<String> outputData;
-    private Logger logger;
+    private MyLogger logger;
 
     /**
      * Конструртора класса, создающий сущность класса. При его создании будет сразу вызван процесс считывания запросов.
@@ -29,7 +29,7 @@ public class Algorithm {
      */
     public Algorithm(List<? extends String> data) {
         this.data = (ArrayList<String>) data;
-        this.logger = MyLogger.getMyLogger(Algorithm.class.getName());
+        this.logger = new MyLogger(Algorithm.class.getName());
         this.start();
     }
 

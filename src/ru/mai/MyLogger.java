@@ -16,10 +16,17 @@ public class MyLogger {
     private static final String SYSTEM = "system";
     private static final String LOG_EXT = ".log";
     public static final Logger sysLogger = Logger.getLogger(SYSTEM);
+    public Logger logger;
+
+    public MyLogger(String name) {
+        logger = getMyLogger(name);
+    }
 
     /**
      * Создает логгер для какого-то процесса с созданием файла логирования для этого процесса.
+     *
      * @param name название процесса
+     *
      * @return логгер этого процесса
      */
     public static Logger getMyLogger(String name) {
@@ -43,5 +50,9 @@ public class MyLogger {
         }
 
         return logger;
+    }
+
+    public void log(Level warning, String message) {
+        logger.log(warning, message);
     }
 }
