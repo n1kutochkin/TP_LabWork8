@@ -25,8 +25,8 @@ public class FileWorker {
      * Стандратный конструктор для класса. Работает с файлами с названием <b>input.txt</b> и <b>output.txt</b>
      */
     FileWorker() throws FileWorkerException {
-        in = Optional.ofNullable(makeReader());
-        out = Optional.ofNullable(makeWriter());
+        in = makeReader();
+        out = makeWriter();
 
         if (!in.isPresent() || !out.isPresent()) {
             throw new FileWorkerException();
@@ -40,8 +40,8 @@ public class FileWorker {
      * @param outputFileName название исходящего текстового файла
      */
     FileWorker(String inputFileName, String outputFileName) throws FileWorkerException {
-        in = Optional.ofNullable(makeReader(inputFileName));
-        out = Optional.ofNullable(makeWriter(outputFileName));
+        in = makeReader(inputFileName);
+        out = makeWriter(outputFileName);
 
         if (!in.isPresent() || !out.isPresent()) {
             throw new FileWorkerException();
@@ -57,36 +57,8 @@ public class FileWorker {
     }
 
 
-    private static BufferedReader makeReader() {
+    private static Optional<BufferedReader> makeReader() {
         return makeReader(INPUT_FILE);
-    }
-
-    private class FileWorkerIOException extends IOException {
-
-        FileWorkerIOException(String whatHappened) {
-            super("Произошла ошибка при чтении/записи файла ввода/вывода");
-        }
-    }
-
-    private class FileWorkerException extends Exception {
-
-        FileWorkerException() {
-            super("Ошибка при работе с файлами. Смотрите лог-файл класса FileWorker.");
-        }
-    }
-
-    private class FileWorkerUnsupportedEncodingException extends UnsupportedEncodingException {
-
-        FileWorkerUnsupportedEncodingException() {
-            super("Файл, который пытаются прочесть или использовать для записи в неверной кодировке");
-        }
-    }
-
-    private class FileWorkerFileNotFoundException extends FileNotFoundException {
-
-        FileWorkerFileNotFoundException() {
-            super("Файл, который указан к чтению/записи не найден. Создаем этот файл.");
-        }
     }
 
     /**
@@ -96,25 +68,25 @@ public class FileWorker {
      *
      * @return класс чтения
      */
-    private static BufferedReader makeReader(String inputFileName) {
+    private static Optional<BufferedReader> makeReader(String inputFileName) {
         try {
-            return new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251"));
+            return Optional.of(new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251")));
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, e.getMessage());
             try {
                 Files.createFile(Paths.get(inputFileName));
-                return new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251"));
+                return Optional.of(new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), "Cp1251")));
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, e.getMessage());
-                return null;
+                return Optional.empty();
             }
         } catch (UnsupportedEncodingException e) {
             logger.log(Level.SEVERE, e.getMessage());
-            return null;
+            return Optional.empty();
         }
     }
 
-    private Writer makeWriter() {
+    private Optional<Writer> makeWriter() {
         return makeWriter(OUTPUT_FILE);
     }
 
@@ -125,17 +97,17 @@ public class FileWorker {
      *
      * @return буфферизированный класс вывода
      */
-    public Writer makeWriter(String outputFileName) {
+    public Optional<Writer> makeWriter(String outputFileName) {
         try {
-            return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8));
+            return Optional.of(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8)));
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, e.getMessage());
             try {
                 Files.createFile(Paths.get(outputFileName));
-                return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8));
+                return Optional.of(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8)));
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, e.getMessage());
-                return null;
+                return Optional.empty();
             }
         }
     }
@@ -181,4 +153,35 @@ public class FileWorker {
             }
         }
     }
+
+    private class FileWorkerException extends Exception {
+
+        FileWorkerException() {
+            super("Ошибка при работе с файлами. Смотрите лог-файл класса FileWorker.");
+        }
+    }
+
+    private class FileWorkerUnsupportedEncodingException extends UnsupportedEncodingException {
+
+        FileWorkerUnsupportedEncodingException() {
+            super("Файл, который пытаются прочесть или использовать для записи в неверной кодировке");
+        }
+    }
+
+    private class FileWorkerIOException extends IOException {
+
+        FileWorkerIOException(String whatHappened) {
+            super("Произошла ошибка при чтении/записи файла ввода/вывода");
+        }
+    }
+
+    private class FileWorkerFileNotFoundException extends FileNotFoundException {
+
+        FileWorkerFileNotFoundException() {
+            super("Файл, который указан к чтению/записи не найден. Создаем этот файл.");
+        }
+    }
 }
+
+
+
