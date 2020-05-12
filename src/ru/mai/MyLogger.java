@@ -16,7 +16,7 @@ public class MyLogger {
     private static final String SYSTEM = "system";
     private static final String LOG_EXT = ".log";
     public static final Logger sysLogger = Logger.getLogger(SYSTEM);
-    public Logger logger;
+    private Logger logger;
 
     public MyLogger(String name) {
         logger = getMyLogger(name);

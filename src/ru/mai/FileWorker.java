@@ -24,7 +24,7 @@ public class FileWorker {
     /**
      * Стандратный конструктор для класса. Работает с файлами с названием <b>input.txt</b> и <b>output.txt</b>
      */
-    FileWorker() throws FileWorkerException {
+    public FileWorker() throws FileWorkerException {
         in = makeReader();
         out = makeWriter();
 
@@ -39,7 +39,7 @@ public class FileWorker {
      * @param inputFileName  название входящего текстового файла
      * @param outputFileName название исходящего текстового файла
      */
-    FileWorker(String inputFileName, String outputFileName) throws FileWorkerException {
+    public FileWorker(String inputFileName, String outputFileName) throws FileWorkerException {
         in = makeReader(inputFileName);
         out = makeWriter(outputFileName);
 
@@ -117,7 +117,7 @@ public class FileWorker {
      *
      * @return массив-список со строками из файла
      */
-    public ArrayList<String> getAllStringsInFile() {
+    public Optional<ArrayList<String>> getAllStringsInFile() {
         ArrayList<String> buffSet = new ArrayList<>();
         String line;
 
@@ -127,13 +127,13 @@ public class FileWorker {
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage());
-            return null;
+            return Optional.empty();
         }
 
         if (buffSet.isEmpty()) {
-            return null;
+            return Optional.empty();
         } else {
-            return buffSet;
+            return Optional.of(buffSet);
         }
     }
 
@@ -142,7 +142,7 @@ public class FileWorker {
      *
      * @param data - список элементов-данных, подобных строкам, на вывод
      */
-    public void printData(List<? extends String> data) {
+    public void printData(List<String> data) {
         for (String out : data) {
             try {
                 this.out.get().write(out);

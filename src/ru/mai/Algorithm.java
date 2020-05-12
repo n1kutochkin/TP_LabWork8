@@ -2,11 +2,9 @@ package ru.mai;
 
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//TODO отрабоать исключения класса Optional
 /**
  * Класс Алгоритм - содержит логику и вычисления.
  *
@@ -19,7 +17,7 @@ public class Algorithm {
     private static final String NO_CARS = "Автомобилей введенной марки не найдено";
     private static final String AVERAGE_COST_IS = "Средняя стоимость машин марки ";
     private Matcher matcher;
-    private Optional<ArrayList<String>> data;
+    private ArrayList<String> data;
     private ArrayList<String> outputData;
     private MyLogger logger;
 
@@ -28,21 +26,17 @@ public class Algorithm {
      *
      * @param data список с данными строкового типа в формате <b>"название бренда авто":"стоимость"</b>*
      */
-    public Algorithm(List<? extends String> data) throws AlgorithmNothingToProcess {
-        this.data = Optional.ofNullable(((ArrayList<String>) data));
-        this.logger = new MyLogger(Algorithm.class.getName());
-        this.start();
+    public Algorithm(Optional<? extends List<String>> data) throws AlgorithmNothingToProcess {
 
-        if (!this.data.isPresent()) {
+        this.logger = new MyLogger(Algorithm.class.getName());
+
+        if (data.isPresent()) {
+            this.data = (ArrayList<String>) data.get();
+        } else {
             throw new AlgorithmNothingToProcess();
         }
-    }
 
-    private class AlgorithmNothingToProcess extends NullPointerException {
-
-        AlgorithmNothingToProcess() {
-            super("Нет данных для обработки. Передан null-указатель");
-        }
+        this.start();
     }
 
     /**
@@ -65,10 +59,9 @@ public class Algorithm {
     }
 
     /**
-     *
      * @return список с информацией после запросов
      */
-    public List<? extends String> getOutputData() {
+    public List<String> getOutputData() {
         return outputData;
     }
 
@@ -93,7 +86,7 @@ public class Algorithm {
         HashMap<String, Car> carBase = new HashMap<>();
         Integer numberOfLine = 1;
 
-        for (String str : data.get()) {
+        for (String str : data) {
             matcher = pattern.matcher(str);
             try {
                 if (matcher.find()) {
@@ -128,11 +121,22 @@ public class Algorithm {
 
         /**
          * Создает сущность класса
-         * @param line содержимое строки
+         *
+         * @param line         содержимое строки
          * @param numberOfLine номер самой строки в файле
          */
         public WrongInputException(final String line, final Integer numberOfLine) {
             super("Некорректные данные: " + line + "\t Строка файла: " + numberOfLine);
+        }
+    }
+
+    /**
+     * Класс-исключение при отсутствии данных для обработки алгоритмом
+     */
+    private static class AlgorithmNothingToProcess extends NullPointerException {
+
+        AlgorithmNothingToProcess() {
+            super("Нет данных для обработки");
         }
     }
 }
