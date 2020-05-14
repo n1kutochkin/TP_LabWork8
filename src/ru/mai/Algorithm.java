@@ -26,14 +26,14 @@ public class Algorithm {
      *
      * @param data список с данными строкового типа в формате <b>"название бренда авто":"стоимость"</b>*
      */
-    public Algorithm(Optional<? extends List<String>> data) throws AlgorithmNothingToProcess {
+    public Algorithm(List<String> data) throws Exception {
 
         this.logger = new MyLogger(Algorithm.class.getName());
 
-        if (data.isPresent()) {
-            this.data = (ArrayList<String>) data.get();
-        } else {
+        if (data.isEmpty()) {
             throw new AlgorithmNothingToProcess();
+        } else {
+            this.data = (ArrayList<String>) data;
         }
 
         this.start();
