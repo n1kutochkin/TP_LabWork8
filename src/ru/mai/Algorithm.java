@@ -1,5 +1,6 @@
 package ru.mai;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -20,6 +21,7 @@ public class Algorithm {
     private ArrayList<String> data;
     private ArrayList<String> outputData;
     private MyLogger logger;
+//    private Tester tester;
 
     /**
      * Конструртора класса, создающий сущность класса. При его создании будет сразу вызван процесс считывания запросов.
@@ -43,18 +45,24 @@ public class Algorithm {
      * Запуск считывания запросов в клавиатуры
      */
     public void start() {
+        Instant start = Instant.now();
         HashMap<String, Car> carBase = generateCarBase();
+        Instant stop = Instant.now();
+        logger.log(Level.INFO, "Время формирование базы брендов = " + (stop.toEpochMilli() - start.toEpochMilli()) + " мс");
         outputData = new ArrayList<>();
 
         while (in.hasNextLine() && !in.hasNext("~")) {
             String buffKey = in.nextLine();
 
+            start = Instant.now();
             if (carBase.containsKey(buffKey)) {
                 Car buffCar = carBase.get(buffKey);
                 outputData.add(generatePhrase(buffCar.getBrand(), buffCar.getAverageCost()));
             } else {
                 outputData.add(NO_CARS);
             }
+            stop = Instant.now();
+            logger.log(Level.INFO, "Время поиска запроса и добавления массив результатов = " + (stop.toEpochMilli() - start.toEpochMilli()) + " мс");
         }
     }
 

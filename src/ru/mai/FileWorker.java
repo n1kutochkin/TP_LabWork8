@@ -65,6 +65,19 @@ public class FileWorker {
         }
     }
 
+    public FileWorker(String inputFileName, String outputFileName, String inputCharSet, String outputCharSet) throws Exception {
+        if (anyException.isPresent()) {
+            throw anyException.get();
+        }
+
+        in = makeReader(inputFileName, inputCharSet);
+        out = makeWriter(outputFileName, outputCharSet);
+
+        if (in.isEmpty() || out.isEmpty()) {
+            throw new FileWorkerException();
+        }
+    }
+
     public Optional<BufferedReader> getIn() {
         return in;
     }
@@ -103,6 +116,25 @@ public class FileWorker {
         }
     }
 
+    private Optional<BufferedReader> makeReader(String inputFileName, String charSet) {
+        try {
+            return Optional.of(new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), charSet)));
+        } catch (FileNotFoundException e) {
+            logger.log(Level.WARNING, /*e.getMessage()*/ new FileWorkerFileNotFoundException().getMessage());
+            try {
+                Files.createFile(Paths.get(inputFileName));
+                return Optional.of(new BufferedReader(new InputStreamReader(new FileInputStream(inputFileName), charSet)));
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, /*e.getMessage()*/ new FileWorkerIOException().getMessage());
+                return Optional.empty();
+            }
+        } catch (UnsupportedEncodingException e) {
+            logger.log(Level.SEVERE, /*e.getMessage()*/ new FileWorkerUnsupportedEncodingException().getMessage());
+            return Optional.empty();
+        }
+    }
+
+
     private Optional<Writer> makeWriter() {
         return makeWriter(OUTPUT_FILE);
     }
@@ -122,6 +154,21 @@ public class FileWorker {
             try {
                 Files.createFile(Paths.get(outputFileName));
                 return Optional.of(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), StandardCharsets.UTF_8)));
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, /*e.getMessage()*/ new FileWorkerIOException().getMessage());
+                return Optional.empty();
+            }
+        }
+    }
+
+    private Optional<Writer> makeWriter(String outputFileName, String charSet) {
+        try {
+            return Optional.of(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), charSet)));
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            logger.log(Level.WARNING, /*e.getMessage()*/ new FileWorkerFileNotFoundException().getMessage());
+            try {
+                Files.createFile(Paths.get(outputFileName));
+                return Optional.of(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), charSet)));
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, /*e.getMessage()*/ new FileWorkerIOException().getMessage());
                 return Optional.empty();

@@ -30,6 +30,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
+            Tester tester = new Tester();
             FileWorker fileWorker = new FileWorker();
             Algorithm algorithm = new Algorithm(fileWorker.getAllStringsInFile());
             fileWorker.printData(algorithm.getOutputData());
